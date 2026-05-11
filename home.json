@@ -1,0 +1,170 @@
+{
+  "log": {
+    "level": "info"
+  },
+
+  "dns": {
+    "servers": [
+      {
+        "tag": "home",
+        "address": "192.168.31.233",
+        "detour": "direct"
+      },
+      {
+        "tag": "china",
+        "address": "223.5.5.5",
+        "detour": "direct"
+      },
+      {
+        "tag": "global",
+        "address": "tls://1.1.1.1",
+        "detour": "auto-out"
+      }
+    ],
+    "rules": [
+      {
+        "ip_cidr": ["192.168.31.0/24"],
+        "server": "home"
+      },
+      {
+        "geosite": ["cn"],
+        "server": "china"
+      }
+    ],
+    "final": "global"
+  },
+
+  "inbounds": [
+    {
+      "type": "vless",
+      "tag": "vless-reality",
+      "listen": "0.0.0.0",
+      "listen_port": 12493,
+      "users": [
+        {
+          "uuid": "YOUR-UUID",
+          "flow": "xts-rprx-vision"
+        }
+      ],
+      "tls": {
+        "enabled": true,
+        "server_name": "www.apple.com",
+        "reality": {
+          "enabled": true,
+          "handshake": {
+            "server": "www.apple.com",
+            "server_port": 443
+          },
+          "private_key": "YOUR-REALITY-KEY",
+          "short_id": ["a1b2c3d4"]
+        }
+      }
+    },
+
+    {
+      "type": "trojan",
+      "tag": "trojan-lan",
+      "listen": "192.168.31.233",
+      "listen_port": 443,
+      "users": [
+        {
+          "password": "LAN-PASSWORD"
+        }
+      ],
+      "tls": {
+        "enabled": true,
+        "certificate_path": "/etc/ssl/cert.pem",
+        "key_path": "/etc/ssl/key.pem"
+      }
+    },
+
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "interface_name": "singbox0",
+      "inet4_address": "172.19.0.1/30",
+      "auto_route": true,
+      "strict_route": true,
+      "stack": "system",
+      "dns_hijack": true
+    }
+  ],
+
+  "outbounds": [
+    {
+      "type": "trojan",
+      "tag": "trojan-out-1",
+      "server": "REMOTE_SERVER_1",
+      "server_port": 443,
+      "password": "REMOTE_PASSWORD",
+      "tls": {
+        "enabled": true,
+        "server_name": "REMOTE_DOMAIN",
+        "alpn": ["h2", "http/1.1"]
+      }
+    },
+
+    {
+      "type": "trojan",
+      "tag": "trojan-out-2",
+      "server": "REMOTE_SERVER_2",
+      "server_port": 443,
+      "password": "REMOTE_PASSWORD_2",
+      "tls": {
+        "enabled": true,
+        "server_name": "REMOTE_DOMAIN_2",
+        "alpn": ["h2", "http/1.1"]
+      }
+    },
+
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+
+    {
+      "type": "block",
+      "tag": "block"
+    }
+  ],
+
+  "route": {
+    "auto_detect_interface": true,
+    "final": "auto-out",
+
+    "rules": [
+      {
+        "protocol": "dns",
+        "outbound": "direct"
+      },
+
+      {
+        "ip_cidr": ["192.168.31.0/24"],
+        "outbound": "direct"
+      },
+
+      {
+        "domain_suffix": ["lan", "local"],
+        "outbound": "direct"
+      },
+
+      {
+        "inbound": ["vless-reality"],
+        "outbound": "direct"
+      },
+
+      {
+        "inbound": ["tun-in"],
+        "outbound": "auto-out"
+      }
+    ],
+
+    "strategy": "round-robin"
+  },
+
+  "experimental": {
+    "cache_file": {
+      "enabled": true
+    }
+  }
+}
