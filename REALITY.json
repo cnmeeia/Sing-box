@@ -1,0 +1,42 @@
+root@iStoreOS:~/sing-box/sing# cat anytls.json
+{
+  "log": {
+    "level": "info"
+  },
+  "inbounds": [
+    {
+      "type": "vless",
+      "tag": "vless-in",
+      "listen": "0.0.0.0",
+      "listen_port": 12493,
+      "users": [
+        {
+          "uuid": "3d37146c-0f89-4110-a460-7a3f3bc69fc9",
+          "flow": "xtls-rprx-vision"
+        }
+      ],
+      "tls": {
+        "enabled": true,
+        "server_name": "www.apple.com",
+        "reality": {
+          "enabled": true,
+          "handshake": {
+            "server": "www.apple.com",
+            "server_port": 443
+          },
+          "private_key": "qFSJZH5mmp8HjWBcci482DHlk3bBddBUOZjA_KxnGVg",
+          "short_id": [
+            "0123456789abcdef"
+          ]
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ]
+}
+root@iStoreOS:~/sing-box/sing#
