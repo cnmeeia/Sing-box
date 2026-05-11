@@ -1,4 +1,4 @@
-root@iStoreOS:~/sing-box/sing# cat anytls.json
+
 {
   "log": {
     "level": "info"
@@ -39,4 +39,3 @@ root@iStoreOS:~/sing-box/sing# cat anytls.json
     }
   ]
 }
-root@iStoreOS:~/sing-box/sing#
